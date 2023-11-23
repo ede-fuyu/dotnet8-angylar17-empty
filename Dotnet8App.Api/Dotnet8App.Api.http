@@ -1,4 +1,4 @@
-@Dotnet8App.Server_HostAddress = http://localhost:5008
+﻿@Dotnet8App.Server_HostAddress = http://localhost:5008
 
 GET {{Dotnet8App.Server_HostAddress}}/weatherforecast/
 Accept: application/json

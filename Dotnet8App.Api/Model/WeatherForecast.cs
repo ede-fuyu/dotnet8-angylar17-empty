@@ -1,4 +1,4 @@
-namespace Dotnet8App.Server
+namespace Dotnet8App.Api.Model
 {
     public class WeatherForecast
     {

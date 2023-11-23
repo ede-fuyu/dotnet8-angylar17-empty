@@ -1,5 +1,9 @@
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Component, OnInit, signal } from '@angular/core';
+import { IdentityService } from '../identity/service/identity.service';
+import { first } from 'rxjs';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faRotate } from '@fortawesome/free-solid-svg-icons';
 
 interface WeatherForecast {
   date: string;
@@ -11,29 +15,27 @@ interface WeatherForecast {
 @Component({
   selector: 'weatherForecast',
   standalone: true,
-  imports: [HttpClientModule],
+  imports: [FontAwesomeModule],
   templateUrl: './weatherForecast.component.html',
   styleUrl: './weatherForecast.component.scss',
 })
 export class WeatherForecastComponent implements OnInit {
-  public forecasts: WeatherForecast[] = [];
+  icon = faRotate;
 
-  constructor(private http: HttpClient) {}
+  forecasts = signal<WeatherForecast[]>([]);
+
+  constructor(private http: HttpClient, private identity: IdentityService) {}
 
   ngOnInit() {
-    this.getForecasts();
+    this.identity.jwtToken$
+      .pipe(first((res) => !!res.accessToken))
+      .subscribe(() => this.getWeatherForecast());
   }
 
-  getForecasts() {
+  getWeatherForecast() {
     this.http.get<WeatherForecast[]>('/weatherforecast').subscribe({
-      next: (result) => {
-        this.forecasts = result;
-      },
-      error: (error) => {
-        console.error(error);
-      },
+      next: (res) => this.forecasts.set(res),
+      error: () => this.forecasts.set([]),
     });
   }
-
-  title = 'dotnet8app.client';
 }

@@ -54,7 +54,13 @@
         </defs>
       </svg>
       <h1>{{ title }}</h1>
-      <p>Congratulations! Your app is running. 🎉</p>
+
+      @if(chackLogin()) {
+      <app-user-profile></app-user-profile>
+      } @else {
+      <app-login></app-login>
+      }
+      <p class="m-0">Congratulations! Your app is running. 🎉</p>
     </div>
     <div class="divider" role="separator" aria-label="Divider"></div>
     <div class="right-side">
@@ -150,3 +156,10 @@
 
 
 <router-outlet></router-outlet>
+<ngx-spinner
+             bdColor="rgba(0, 0, 0, 0.8)"
+             size="medium"
+             color="#fff"
+             type="ball-atom"
+             [fullScreen]="true">
+</ngx-spinner>
