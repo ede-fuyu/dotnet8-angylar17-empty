@@ -99,7 +99,7 @@ public static class IdentityApiRouteBuilder
         // 生成驗證碼圖片
         routeGroup.MapGet("/captcha", (ICaptchaService captchaService) =>
         {
-            var captchaInfo = captchaService.Create(2);
+            var captchaInfo = captchaService.Generate();
 
             string base64 = Convert.ToBase64String(captchaInfo.Image, 0, captchaInfo.Image.Length);
 
