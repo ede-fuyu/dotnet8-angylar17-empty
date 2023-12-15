@@ -9,7 +9,7 @@ namespace Dotnet8App.Api.Controllers
     public class IdentityController : ControllerBase
     {
         /// <summary>
-        //// 取得 JWT Token 中的所有 Claims
+        /// 取得 JWT Token 中的所有 Claims
         /// </summary>
         /// <returns></returns>
         [HttpGet]

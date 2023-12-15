@@ -9,7 +9,7 @@
         NoUppercase, // 不用大寫字母(不含0、o)
         NoLowercase, // 不用小寫字母(不含0、O)
         RandomChoice, // 只用數字, 只用大寫字母, 只用小寫字母  三種隨機擇一
-        All // 全部   
+        All // 全部 (不含0、O、o)
     }
 
     public class CaptchaInfo

@@ -3,3 +3,4 @@ bin/
 obj/
 *.user
 .config/
+Dotnet8App.Api/logs/
