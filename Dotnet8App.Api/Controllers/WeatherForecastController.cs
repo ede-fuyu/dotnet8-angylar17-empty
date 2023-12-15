@@ -1,5 +1,6 @@
 using Dotnet8App.Api.Infrastructure;
 using Dotnet8App.Api.Model;
+using Dotnet8App.Service;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dotnet8App.Api.Controllers
@@ -7,7 +8,7 @@ namespace Dotnet8App.Api.Controllers
     [ApiController]
     [JwtAuthorize]
     [Route("[controller]")]
-    public class WeatherForecastController : ControllerBase
+    public class WeatherForecastController(IAppLogService service) : ControllerBase
     {
         private static readonly string[] Summaries =
         [
@@ -17,13 +18,22 @@ namespace Dotnet8App.Api.Controllers
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            var logs = service.GetAppLogs().Select(p => new WeatherForecast
             {
-                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
+                Date = DateOnly.FromDateTime(p.TimeStamp),
+                TemperatureC = p.Id,
+                Summary = p.Level
+            }).ToArray();
+
+            return logs;    
+            
+            //return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            //{
+            //    Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+            //    TemperatureC = Random.Shared.Next(-20, 55),
+            //    Summary = Summaries[Random.Shared.Next(Summaries.Length)]
+            //})
+            //.ToArray();
         }
     }
 }

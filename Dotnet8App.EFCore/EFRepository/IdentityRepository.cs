@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace Dotnet8App.EFCore.EFRepository
+namespace Dotnet8App.EFCore
 {
     public class IdentityRepository(ApplicationDbContext context) : Repository<IdentityUser>(context), IIdentityRepository
     {

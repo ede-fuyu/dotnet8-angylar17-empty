@@ -1,6 +1,5 @@
 ﻿using Dotnet8App.Api.Infrastructure;
 using Dotnet8App.EFCore;
-using Dotnet8App.EFCore.EFRepository;
 using Dotnet8App.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -100,9 +99,10 @@ try
             .AddClasses(classes => classes.Where(t => t.Name.EndsWith("Manager", StringComparison.OrdinalIgnoreCase)
                                                 || t.Name.EndsWith("Service", StringComparison.OrdinalIgnoreCase)
                                                 || t.Name.EndsWith("Repository", StringComparison.OrdinalIgnoreCase)
-                                                || t.Name.EndsWith("UnitOfWork", StringComparison.OrdinalIgnoreCase)))
-        .AsImplementedInterfaces()
-        .WithScopedLifetime());
+                                                || t.Name.EndsWith("UnitOfWork", StringComparison.OrdinalIgnoreCase)
+                                                || (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Repository<>))))
+            .AsImplementedInterfaces()
+            .WithScopedLifetime());
 
     builder.Services.AddDistributedMemoryCache();
     builder.Services.AddSession(options =>
