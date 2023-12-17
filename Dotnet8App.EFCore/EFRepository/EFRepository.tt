@@ -1,0 +1,93 @@
+﻿<#@ template language="C#" debug="true" hostspecific="true"#>
+<#@ include file="EF.Utility.CS.ttinclude"#>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Diagnostics" #>
+<#@ assembly name="System.Memory" #>
+<#@ assembly name="System.Text.Json" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Text.Json" #>
+<#@ output extension=".cs" #>
+<#
+    string settingsPath = this.Host.ResolvePath("..\\efpt.config.json");
+    string settingsJson = File.ReadAllText(settingsPath);
+    JsonDocument settingsJsonDoc = JsonDocument.Parse(settingsJson);
+
+    var RootNamespace = settingsJsonDoc.RootElement.GetProperty("ProjectRootNamespace").GetString();
+    var ContextName = settingsJsonDoc.RootElement.GetProperty("ContextClassName").GetString();
+    var Tables = settingsJsonDoc.RootElement.GetProperty("Tables").EnumerateArray().ToList();
+
+    EntityFrameworkTemplateFileManager fileManager = EntityFrameworkTemplateFileManager.Create(this);
+
+    foreach(var table in Tables)
+    {
+        var TableName = table.GetProperty("Name").GetString();
+        var EntityName = TableName.Split('[', '.', ']').Where(p => !string.IsNullOrEmpty(p)).Last();
+        if(!DoesFileExist(EntityName + "Repository.cs"))
+        {
+            fileManager.StartNewFile(EntityName + "Repository.cs");
+
+#>﻿using Dotnet8App.EFCore.EntityTables;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Text;
+
+namespace <#= RootNamespace #>;
+
+public class <#= EntityName #>Repository(<#= ContextName #> context) : Repository<<#= EntityName #>>(context), I<#= EntityName #>Repository
+{
+
+}
+
+public interface I<#= EntityName #>Repository : IRepository<<#= EntityName #>>
+{
+
+}
+
+<#
+        }
+        else 
+        {
+        	fileManager.StartNewFile(EntityName + "Repository.cs");
+		    this.Write(OutputFile(EntityName + "Repository.cs"));
+        }
+    }
+
+    fileManager.Process();
+#>
+<#+
+
+bool DoesFileExist(string filename)
+{			
+	return File.Exists(Path.Combine(GetCurrentDirectory(),filename));	
+}
+
+string OutputFile(string filename)
+{
+	using(StreamReader sr = new StreamReader(Path.Combine(GetCurrentDirectory(),filename)))
+	{
+		string contents = sr.ReadToEnd();
+		return contents;
+	}
+}
+
+string GetCurrentDirectory()
+{
+	string executingDirectoryName = "";
+	string stackTraceFileName = new StackTrace(true).GetFrame(0).GetFileName();
+	if (String.IsNullOrEmpty(stackTraceFileName))
+	{
+		throw new ArgumentException("No value was specified for the 'directoryName' configuration parameter" +
+			", and we could not figure out the file name from the stack trace (most likely because of running " +
+			"the template with debug='False' specified in the <\u0023@ template \u0023> directive.");
+	}
+	else
+	{		
+		executingDirectoryName = Path.GetDirectoryName(stackTraceFileName);
+	}	
+	return executingDirectoryName;
+}
+#>
